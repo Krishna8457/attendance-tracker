@@ -1,0 +1,12 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+  <h1 class="mb-4">Courses</h1>
+  <div class="list-group">
+    {% for course in courses %}
+      <a href="{% url 'attendance_sheet' course.id %}" class="list-group-item list-group-item-action">
+        {{ course.name }}
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}

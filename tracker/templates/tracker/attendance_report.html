@@ -1,0 +1,74 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Attendance Report: {{ course.name }}</h1>
+    <a href="{% url 'attendance_sheet' course.id %}" class="btn btn-secondary">Take Today's Attendance</a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <canvas id="attendanceChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header">
+      Daily Breakdown
+    </div>
+    <div class="list-group list-group-flush">
+      {% for report_date in dates %}
+        <a href="{% url 'daily_detail_report' course.id report_date.year report_date.month report_date.day %}" class="list-group-item list-group-item-action">
+          View Details for {{ report_date|date:"F d, Y" }}
+        </a>
+      {% empty %}
+        <div class="list-group-item">No attendance has been recorded yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Fetch data from the URL we created
+      fetch("{% url 'attendance_chart_data' course.id %}")
+        .then(response => response.json())
+        .then(data => {
+          // Get the canvas element from the HTML
+          const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+          // Create the chart using Chart.js
+          new Chart(ctx, {
+            type: 'bar', // Type of chart
+            data: {
+              labels: data.labels, // Dates on the X-axis
+              datasets: [{
+                label: 'Present',
+                data: data.present_data, // Present counts
+                backgroundColor: 'rgba(28, 176, 114, 0.5)',
+                borderColor: 'rgba(28, 176, 114, 1)',
+                borderWidth: 1
+              }, {
+                label: 'Absent',
+                data: data.absent_data, // Absent counts
+                backgroundColor: 'rgba(237, 100, 93, 0.5)',
+                borderColor: 'rgba(237, 100, 93, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    // Only show whole numbers on the Y-axis
+                    precision: 0
+                  }
+                }
+              }
+            }
+          });
+        });
+    });
+  </script>
+{% endblock %}

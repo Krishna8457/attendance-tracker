@@ -1,0 +1,39 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+  <h1 class="mb-2">Attendance Details: {{ course.name }}</h1>
+  <p class="lead mb-4">Date: {{ report_date|date:"F d, Y" }}</p>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          Present Students
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for student in present_students %}
+            <li class="list-group-item">{{ student }}</li>
+          {% empty %}
+            <li class="list-group-item">No students were marked present.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          Absent Students
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for student in absent_students %}
+            <li class="list-group-item">{{ student }}</li>
+          {% empty %}
+            <li class="list-group-item">No students were marked absent.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <a href="{% url 'attendance_report' course.id %}" class="btn btn-secondary mt-4">Back to Summary Report</a>
+{% endblock %}
